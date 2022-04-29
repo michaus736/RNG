@@ -3,8 +3,9 @@ using NAudio;
 using NAudio.Wave;
 
 
-var microphoneHandler= new MicrophoneHandler();
-
+var extractor= new Extractor();
+await extractor.GetSamples();
+extractor.Parser();
 Console.WriteLine(123);
 
 //testing
