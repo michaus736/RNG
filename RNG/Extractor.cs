@@ -60,7 +60,7 @@ namespace RNG
             Thread.Sleep(MILISTOWAIT);
 
             StopRecording();
-
+            
 
             buffer = memoryStream.GetBuffer()[OFFSET..(BUFFER_SIZE + OFFSET)];
             
