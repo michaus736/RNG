@@ -3,10 +3,9 @@ using NAudio;
 using NAudio.Wave;
 
 
-var extractor= new Extractor();
-await extractor.GetSamples();
-extractor.Parser();
-Console.WriteLine(123);
+PostProcessingRNG postProcessingRNG = new PostProcessingRNG();
+
+
 
 //testing
 
