@@ -24,7 +24,7 @@ namespace RNG
         /// <summary>
         /// N - size of required TRNS(bits)
         /// </summary>
-        private static readonly int N = (Extractor.BUFFER_SIZE / 2) / 8 * 256;//??
+        private static readonly int N = 1048576;//??
         /// <summary>
         /// GAMMA - number of iterations
         /// </summary>
@@ -82,11 +82,11 @@ namespace RNG
 
             int counter = 0;
 
-            while (O.Count < N)
+            while (O.Count < 100000)
             {
                 string num = "";
 
-                for (int i = 0; i < L; i++)
+                for (int i = 0; i < L-1; i++)
                 {
                     x[i] = ((0.071428571 * data[counter]) + x[i]) * 0.666666667;//?? co z t w x_t^i i co to jest y przy r we wzorze
                     counter++;
@@ -122,7 +122,6 @@ namespace RNG
                     ulong temp = Convert.ToUInt64(z[j]);
                     string t =temp.ToString();
                     num += t;
-
                 }
                 double num1 = double.Parse(num);
                 O.Add(num1);
