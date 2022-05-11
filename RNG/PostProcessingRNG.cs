@@ -90,7 +90,7 @@ namespace RNG
                 {
                     x[i] = ((0.071428571 * data[counter]) + x[i]) * 0.666666667;//?? co z t w x_t^i i co to jest y przy r we wzorze
                     counter++;
-                    if(x[i]<0||x[i]>1)throw new ArithmeticException("no zjebało się na amen");
+                    //if(x[i]<0||x[i]>1)throw new ArithmeticException("no zjebało się na amen");
                 }
 
 
