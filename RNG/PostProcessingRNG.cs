@@ -77,15 +77,16 @@ namespace RNG
             data = data.Select(x => (byte)(x & pattern3LSB)).ToArray();
 
             double[] x=new double[8];
+            ulong[] z = new ulong[8];
             Array.Copy(X_INITIAL,x,X_INITIAL.Length);
 
             int counter = 0;
 
             while (O.Count < N)
             {
+                string num = "";
 
-
-                for(int i = 0; i < L; i++)
+                for (int i = 0; i < L; i++)
                 {
                     x[i] = ((0.071428571 * data[counter]) + x[i]) * 0.666666667;//?? co z t w x_t^i i co to jest y przy r we wzorze
                     counter++;
@@ -93,18 +94,60 @@ namespace RNG
                 }
 
 
-                for(int t = 0; t < GAMMA; t++)
+                for(int t = 0; t < GAMMA-1; t++)
                 {
-                    for(int i = 0; i < L; i++)
+                    for(int i = 0; i < L-1; i++)
                     {
-                        //todo
+                        x[i] = (1 - EPSILON) * TentMap(x[i]) + (EPSILON / 2) * TentMap(x[i % L]) + TentMap(x[(i - 1)%L]);
                     }
                 }
-                //todo
+                for (int i = 0; i < L - 1; i++) 
+                {
+                     string value= x[i].ToString();
+                    z[i] = UInt64.Parse(value);
+
+                }
+                for (int j = 0; j <(L/2-1); j++) 
+                {
+                    z[j] = z[j] ^ swap(z[j+(L/2)]);
+                }
+                for (int j = 0; j <= 3; j++)
+                {
+                   string t= z[j].toString();
+                    num += t;
+
+                }
+                int x = num.toInt();
+                O.Add(x);
             }
-            
         }
 
+        private ulong swap(ulong v)
+        {
+            string tmp="";
+           var z= v.ToString();
+            ulong x;
+            for (int i = 0; i <= 31; i++) 
+            {
+                tmp += z[i];
+            }
+            for (int i = 63; i >= 32; i--)
+            {
+                tmp += z[i];
+            }
+            x = UInt64.Parse(tmp);
+
+            return x;
+        }
+
+        double TentMap(double x)
+        {
+            if (x < 0.5)
+                return ALPHA * x;
+            else
+                return ALPHA * (1 - x);
+
+        }
 
     }
 }

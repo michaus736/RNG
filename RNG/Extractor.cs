@@ -18,8 +18,9 @@ namespace RNG
         const int SAMPLE_ARRAY_SIZE = BUFFER_SIZE * 3;
         const int MILISTOWAIT = 20000;
         const int OFFSET = 80000;
+        const int CHUNK = 80000;
 
-        
+
 
 
 
