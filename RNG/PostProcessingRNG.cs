@@ -24,7 +24,7 @@ namespace RNG
         /// <summary>
         /// N - size of required TRNS(bits)
         /// </summary>
-        private static readonly int N = (Extractor.BUFFER_SIZE / 2) / 8 * 256;//??
+        private static readonly int N = 1048576;//??
         /// <summary>
         /// GAMMA - number of iterations
         /// </summary>
@@ -58,10 +58,10 @@ namespace RNG
         {
             extractor = new();
             data = createSamples();
-
-            var audioHistogram = data.CreateHistogramFromArray();
-            audioHistogram.WriteHistogramToFile("soundHistogram.txt");
+            var histogram = data.CreateHistogramFromArray();
+            histogram.WriteHistogramToFile("histogramFile.txt");
             Parse();
+
         }
 
         public byte[] createSamples()
@@ -74,74 +74,82 @@ namespace RNG
         public void Parse()
         {
             //output list of random 256-bit numbers
-            List<decimal> O = new List<decimal>();
+            List<double> O = new List<double>();
             int n = Extractor.BUFFER_SIZE / 2;
 
             data = data.Select(x => (byte)(x & pattern3LSB)).ToArray();
 
-            double[] x=new double[8];
+            double[] x = new double[8];
             ulong[] z = new ulong[8];
-            Array.Copy(X_INITIAL,x,X_INITIAL.Length);
+            Array.Copy(X_INITIAL, x, X_INITIAL.Length);
 
             int counter = 0;
 
-            while (O.Count < N)
+            while (O.Count < 100000)
             {
                 string num = "";
 
-                for (int i = 0; i < L; i++)
+                for (int i = 0; i < L - 1; i++)
                 {
                     x[i] = ((0.071428571 * data[counter]) + x[i]) * 0.666666667;//?? co z t w x_t^i i co to jest y przy r we wzorze
                     counter++;
-                    if(x[i]<0||x[i]>1)throw new ArithmeticException("no zjebało się na amen");
+                    //if(x[i]<0||x[i]>1)throw new ArithmeticException("no zjebało się na amen");
                 }
 
 
-                for(int t = 0; t < GAMMA-1; t++)
+                for (int t = 0; t < GAMMA - 1; t++)
                 {
-                    for(int i = 0; i < L-1; i++)
+                    for (int i = 0; i < L - 1; i++)
                     {
-                        x[i] = (1 - EPSILON) * TentMap(x[i]) + (EPSILON / 2) * TentMap(x[i % L]) + TentMap(x[(i - 1)%L]);
+                        int index1 = i % L;
+                        int index2 = (i - 1) % L;
+                        if (i == 0)
+                            index2 = i % L;
+                        else
+                            x[i] = (1 - EPSILON) * TentMap(x[i]) + (EPSILON / 2) * TentMap(x[index1]) + TentMap(x[index2]);
                     }
                 }
-                for (int i = 0; i < L - 1; i++) 
+                for (int i = 0; i < L - 1; i++)
                 {
-                     string value= x[i].ToString();
-                    z[i] = UInt64.Parse(value);
+                    z[i] = (ulong)(x[i]);
 
                 }
-                for (int j = 0; j <(L/2-1); j++) 
+                for (int j = 0; j < ((L / 2) - 1); j++)
                 {
-                    z[j] = z[j] ^ swap(z[j+(L/2)]);
+                    int f = j + (L / 2);
+                    ulong d = z[j] ^ z[f];
+                    z[j] = d;
                 }
                 for (int j = 0; j <= 3; j++)
                 {
-                   string t= z[j].ToString();
+                    ulong temp = Convert.ToUInt64(z[j]);
+                    string t = temp.ToString();
                     num += t;
-
                 }
-                int randomNumber = Convert.ToInt32(num);
-                O.Add(randomNumber);
+                double num1 = double.Parse(num);
+                O.Add(num1);
             }
+            var histogram = O.CreateHistogramFromArray();
+            histogram.WriteHistogramToFile("plik.txt");
         }
 
-        private ulong swap(ulong v)
-        {
-            string tmp="";
-           var z= v.ToString();
-            ulong x;
-            for (int i = 0; i <= 31; i++) 
-            {
-                tmp += z[i];
-            }
-            for (int i = 63; i >= 32; i--)
-            {
-                tmp += z[i];
-            }
-            x = UInt64.Parse(tmp);
-
-            return x;
-        }
+        /* private ulong Swap(ulong v)
+         {
+             string tmp="";
+            var z= v.ToString();
+             var c =z.Length;
+             ulong x;
+             for (int i = 0; i <=(c/2)-1; i++) 
+             {
+                 tmp += z[i];
+             }
+             for (int i = c-1; i >=c/2; i--)
+             {
+                 tmp += z[i];
+             }
+             x=Convert.ToUInt64(tmp);
+             return x;
+         }*/
 
         double TentMap(double x)
         {
