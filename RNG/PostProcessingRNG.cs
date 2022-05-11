@@ -58,6 +58,9 @@ namespace RNG
         {
             extractor = new();
             data = createSamples();
+
+            var audioHistogram = data.CreateHistogramFromArray();
+            audioHistogram.WriteHistogramToFile("soundHistogram.txt");
             Parse();
         }
 
@@ -113,12 +116,12 @@ namespace RNG
                 }
                 for (int j = 0; j <= 3; j++)
                 {
-                   string t= z[j].toString();
+                   string t= z[j].ToString();
                     num += t;
 
                 }
-                int x = num.toInt();
-                O.Add(x);
+                int randomNumber = Convert.ToInt32(num);
+                O.Add(randomNumber);
             }
         }
 
