@@ -117,7 +117,7 @@ namespace RNG
                 for (int j = 0; j < ((L / 2) - 1); j++)
                 {
                     int f = j + (L / 2);
-                    ulong d = z[j] ^ z[f];
+                    ulong d = z[j] ^ Swap(z[f]);
                     z[j] = d;
                 }
                 for (int j = 0; j <= 3; j++)
@@ -133,23 +133,24 @@ namespace RNG
             histogram.WriteHistogramToFile("plik.txt");
         }
 
-        /* private ulong Swap(ulong v)
+         private ulong Swap(ulong v)
          {
              string tmp="";
             var z= v.ToString();
              var c =z.Length;
              ulong x;
-             for (int i = 0; i <=(c/2)-1; i++) 
+            for (int i = c - 1; i >= c / 2; i--)
+            {
+                tmp += z[i];
+            }
+            for (int i = 0; i <=(c/2)-1; i++) 
              {
                  tmp += z[i];
              }
-             for (int i = c-1; i >=c/2; i--)
-             {
-                 tmp += z[i];
-             }
-             x=Convert.ToUInt64(tmp);
+            double temp=double.Parse(tmp);
+             x=(ulong)temp;
              return x;
-         }*/
+         }
 
         double TentMap(double x)
         {
