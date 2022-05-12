@@ -81,6 +81,7 @@ namespace RNG
 
             double[] x = new double[8];
             ulong[] z = new ulong[8];
+            
             Array.Copy(X_INITIAL, x, X_INITIAL.Length);
 
             int counter = 0;
@@ -120,17 +121,28 @@ namespace RNG
                     ulong d = z[j] ^ Swap(z[f]);
                     z[j] = d;
                 }
-                for (int j = 0; j <= 3; j++)
+             /*   for (int j = 0; j <= 3; j++)
                 {
                     ulong temp = Convert.ToUInt64(z[j]);
                     string t = temp.ToString();
                     num += t;
                 }
-                double num1 = double.Parse(num);
-                O.Add(num1);
+                double num1 = double.Parse(num);*/
+                for (int i=0;i<=3;i++) {
+                    byte toAdd = 0;
+                    for (int j = 0; j <= 7;j++) 
+                    {
+                        int mask = 0b11111111;
+                        byte temp =(byte) ((z[i] & (ulong)mask)>>(8*j));
+                        O.Add(temp);
+
+                    }
+
+                  //  O.Add();
+                }
             }
-            var histogram = O.CreateHistogramFromArray();
-            histogram.WriteHistogramToFile("plik.txt");
+            //var histogram = O.CreateHistogramFromArray();
+           // histogram.WriteHistogramToFile("plik.txt");
         }
 
          private ulong Swap(ulong v)
@@ -158,7 +170,6 @@ namespace RNG
                 return ALPHA * x;
             else
                 return ALPHA * (1 - x);
-
         }
 
     }
