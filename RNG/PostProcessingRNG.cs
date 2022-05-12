@@ -59,7 +59,7 @@ namespace RNG
             extractor = new();
             data = createSamples();
             var histogram = data.CreateHistogramFromArray();
-            histogram.WriteHistogramToFile("histogramFile.txt");
+            histogram.WriteHistogramToFile("ExtractorHistogram.txt");
             Parse();
 
         }
@@ -141,8 +141,8 @@ namespace RNG
                   //  O.Add();
                 }
             }
-            //var histogram = O.CreateHistogramFromArray();
-           // histogram.WriteHistogramToFile("plik.txt");
+            var histogram = O.CreateHistogramFromArray();
+            histogram.WriteHistogramToFile("PreprocessingHistogram.txt");
         }
 
          private ulong Swap(ulong v)
