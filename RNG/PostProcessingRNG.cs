@@ -133,7 +133,7 @@ namespace RNG
                     for (int j = 0; j <= 7;j++) 
                     {
                         int mask = 0b11111111;
-                        byte temp =(byte) ((z[i] & (ulong)mask)>>(8*j));
+                        byte temp =(byte) (((z[i])>>(8*j)) & (ulong)mask);
                         O.Add(temp);
 
                     }

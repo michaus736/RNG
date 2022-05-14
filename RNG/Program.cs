@@ -3,10 +3,10 @@ using NAudio;
 using NAudio.Wave;
 
 
-//PostProcessingRNG postProcessingRNG = new PostProcessingRNG();
+PostProcessingRNG postProcessingRNG = new PostProcessingRNG();
 
 
 
 //testing
-Extractor.printAudioInputDevices();
+//Extractor.printAudioInputDevices();
 
