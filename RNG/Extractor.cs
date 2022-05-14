@@ -110,13 +110,13 @@ namespace RNG
 
         public static void printAudioInputDevices()
         {
-
+            ;
             for(int i = 0; i < WaveIn.DeviceCount; i++)
             {
                 var item = WaveIn.GetCapabilities(i);
                 Console.WriteLine("{0}: {1}{2}"
                     ,i,
-                    item.NameGuid.ToString(),
+                    item.ProductGuid.ToString(),
                     item.ProductName
                     );
             }
