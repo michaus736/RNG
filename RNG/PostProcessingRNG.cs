@@ -79,12 +79,18 @@ namespace RNG
 
             data = data.Select(x => (byte)(x & pattern3LSB)).ToArray();
 
-            double[] x = new double[8];
-            ulong[] z = new ulong[8];
+            double[] c = new double[8];
+            long[] z = new long[8];
             
-            Array.Copy(X_INITIAL, x, X_INITIAL.Length);
+            Array.Copy(X_INITIAL, c, X_INITIAL.Length);
 
+            double[,] x = new double[GAMMA, 8];
+            for (int i = 0; i < L; i++)
+            {
+                x[0, i] = c[i];
+            }
             int counter = 0;
+
 
             while (O.Count < 100000)
             {
@@ -92,7 +98,8 @@ namespace RNG
 
                 for (int i = 0; i < L - 1; i++)
                 {
-                    x[i] = ((0.071428571 * data[counter]) + x[i]) * 0.666666667;//?? co z t w x_t^i i co to jest y przy r we wzorze
+                    int t = 0;
+                    x[t, i] = ((0.071428571 * data[counter]) + x[t, i]) * 0.666666667;//?? co z t w x_t^i i co to jest y przy r we wzorze
                     counter++;
                     //if(x[i]<0||x[i]>1)throw new ArithmeticException("no zjebało się na amen");
                 }
@@ -100,40 +107,35 @@ namespace RNG
 
                 for (int t = 0; t < GAMMA - 1; t++)
                 {
-                    for (int i = 0; i < L - 1; i++)
+                    for (int i = 0; i <= L - 1; i++)
                     {
+
                         int index1 = i % L;
                         int index2 = (i - 1) % L;
                         if (i == 0)
                             index2 = i % L;
                         else
-                            x[i] = (1 - EPSILON) * TentMap(x[i]) + (EPSILON / 2) * TentMap(x[index1]) + TentMap(x[index2]);
+                            index2 = (i - 1) % L;
+                        x[t + 1, i] = (1 - EPSILON) * TentMap(x[t, i]) + (EPSILON / 2) * TentMap(x[t, index1]) + TentMap(x[t, index2]);
                     }
-                }
-                for (int i = 0; i < L - 1; i++)
+                    }
+                for (int i = 0; i <= L - 1; i++)
                 {
-                    z[i] = (ulong)(x[i]);
+                    z[i] = (long)(x[GAMMA - 1, i]);
+                    x[0, i] = x[GAMMA - 1, i];
 
                 }
-                for (int j = 0; j < ((L / 2) - 1); j++)
+                for (int j = 0; j <= ((L / 2) - 1); j++)
                 {
                     int f = j + (L / 2);
-                    ulong d = z[j] ^ Swap(z[f]);
-                    z[j] = d;
+                   z[j] = z[j] ^ Swap(z[f]);
                 }
-             /*   for (int j = 0; j <= 3; j++)
-                {
-                    ulong temp = Convert.ToUInt64(z[j]);
-                    string t = temp.ToString();
-                    num += t;
-                }
-                double num1 = double.Parse(num);*/
-                for (int i=0;i<=3;i++) {
-                    byte toAdd = 0;
-                    for (int j = 0; j <= 7;j++) 
+                for (int i=0;i<4;i++) {
+
+                    for (int j = 0; j <4;j++) 
                     {
-                        int mask = 0b11111111;
-                        byte temp =(byte) (((z[i])>>(8*j)) & (ulong)mask);
+                        long mask = 0b11111111;
+                        byte temp = (byte)((z[i] >>= (8 * j)) & mask);
                         O.Add(temp);
 
                     }
@@ -145,24 +147,14 @@ namespace RNG
             histogram.WriteHistogramToFile("PreprocessingHistogram.txt");
         }
 
-         private ulong Swap(ulong v)
+         private long Swap(long v)
          {
-             string tmp="";
-            var z= v.ToString();
-             var c =z.Length;
-             ulong x;
-            for (int i = c - 1; i >= c / 2; i--)
-            {
-                tmp += z[i];
-            }
-            for (int i = 0; i <=(c/2)-1; i++) 
-             {
-                 tmp += z[i];
-             }
-            double temp=double.Parse(tmp);
-             x=(ulong)temp;
-             return x;
-         }
+            byte[] bytes = BitConverter.GetBytes(v);
+
+            Array.Reverse(bytes);
+            v = BitConverter.ToInt64(bytes, 0);
+            return v;
+        }
 
         double TentMap(double x)
         {
