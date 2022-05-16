@@ -79,7 +79,7 @@ namespace RNG
             data = data.Select(x => (byte)(x & pattern3LSB)).ToArray();
 
             double[] c = new double[8];
-            long[] z = new long[8];
+            double[] z = new double[8];
 
             Array.Copy(X_INITIAL, c, X_INITIAL.Length);
 
@@ -88,7 +88,7 @@ namespace RNG
             {
                 x[0, i] = c[i];
             }
-            int counter = 0;
+            int counter =0;
 
 
             while (O.Count < 100000)
@@ -109,72 +109,50 @@ namespace RNG
                     for (int i = 0; i <= L - 1; i++)
                     {
 
-                        int index1 = i % L;
+                        int index1 = (i+1) % L;
                         int index2 = (i - 1) % L;
                         if (i == 0)
                             index2 = i % L;
                         else
                             index2 = (i - 1) % L;
-                        x[t + 1, i] = (1 - EPSILON) * TentMap(x[t, i]) + (EPSILON / 2) * TentMap(x[t, index1]) + TentMap(x[t, index2]);
+                        x[t + 1, i] = (1 - EPSILON) * TentMap(x[t, i]) + (EPSILON / 2) * (TentMap(x[t, index1]) + TentMap(x[t, index2]));
                     }
                 }
                 for (int i = 0; i <= L - 1; i++)
                 {
-                    z[i] = (long)(x[GAMMA - 1, i]);
+                        z[i] = x[0, i];
                     x[0, i] = x[GAMMA - 1, i];
 
                 }
                 for (int j = 0; j <= ((L / 2) - 1); j++)
                 {
                     int f = j + (L / 2);
-                    z[j] = z[j] ^ Swap(z[f]);
+                    z[j] =  Swap(z[f]);
                 }
                 for (int i = 0; i < 4; i++)
                 {
-
                     for (int j = 0; j < 4; j++)
                     {
-                        /*long afterShift = z[i] >>= (8 * j);
-                        long mask = 0b11111111;
-                        byte temp = (byte)(afterShift & mask);*/
-
-                        long table = z[i] >>= 8 * j;
+                        ulong table =(ulong) z[i];
+                        table = table >> (8 * j);
                         byte temp = (byte)(table % 255);
-                       temp =(byte) HashingCode(temp);
                         O.Add(temp);
-
                     }
 
-                    //  O.Add();
                 }
+                
             }
             var histogram = O.CreateHistogramFromArray();
             histogram.WriteHistogramToFile("PreprocessingHistogram.txt");
         }
 
-        private long HashingCode(long z)
-        {
-            long value = 56732344513432;
-
-            for (int i = 0; i < 32; i++)
-            {
-                z = z * value + i + value * z - z * i;
-                value = z % (i + 1);
-            }
-            for (int i = 0; i < z % 8; i++)
-            {
-
-                z = (i+15) * value + z*(value%(i+3));
-                z =-value;
-            }
-            return z;
-        }
-        private long Swap(long v)
+       
+        private double Swap(double v)
         {
             byte[] bytes = BitConverter.GetBytes(v);
 
             Array.Reverse(bytes);
-            v = BitConverter.ToInt64(bytes, 0);
+            v = BitConverter.ToUInt64(bytes, 0);
             return v;
         }
 
