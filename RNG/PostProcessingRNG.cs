@@ -138,9 +138,8 @@ namespace RNG
                         long mask = 0b11111111;
                         byte temp = (byte)(afterShift & mask);*/
 
-                        byte mask = 0b10101010;
                         long table = z[i] >>= 8 * j;
-                        byte temp = (byte)(table & 255);
+                        byte temp = (byte)(table % 255);
                        temp =(byte) HashingCode(temp);
                         O.Add(temp);
 
