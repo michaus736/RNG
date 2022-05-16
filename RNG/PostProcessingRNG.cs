@@ -74,14 +74,13 @@ namespace RNG
         public void Parse()
         {
             //output list of random 256-bit numbers
-            List<double> O = new List<double>();
+            List<byte> O = new List<byte>();
             int n = Extractor.BUFFER_SIZE / 2;
-
             data = data.Select(x => (byte)(x & pattern3LSB)).ToArray();
 
             double[] c = new double[8];
             long[] z = new long[8];
-            
+
             Array.Copy(X_INITIAL, c, X_INITIAL.Length);
 
             double[,] x = new double[GAMMA, 8];
@@ -118,7 +117,7 @@ namespace RNG
                             index2 = (i - 1) % L;
                         x[t + 1, i] = (1 - EPSILON) * TentMap(x[t, i]) + (EPSILON / 2) * TentMap(x[t, index1]) + TentMap(x[t, index2]);
                     }
-                    }
+                }
                 for (int i = 0; i <= L - 1; i++)
                 {
                     z[i] = (long)(x[GAMMA - 1, i]);
@@ -128,27 +127,51 @@ namespace RNG
                 for (int j = 0; j <= ((L / 2) - 1); j++)
                 {
                     int f = j + (L / 2);
-                   z[j] = z[j] ^ Swap(z[f]);
+                    z[j] = z[j] ^ Swap(z[f]);
                 }
-                for (int i=0;i<4;i++) {
+                for (int i = 0; i < 4; i++)
+                {
 
-                    for (int j = 0; j <4;j++) 
+                    for (int j = 0; j < 4; j++)
                     {
+                        /*long afterShift = z[i] >>= (8 * j);
                         long mask = 0b11111111;
-                        byte temp = (byte)((z[i] >>= (8 * j)) & mask);
+                        byte temp = (byte)(afterShift & mask);*/
+
+                        byte mask = 0b10101010;
+                        long table = z[i] >>= 8 * j;
+                        byte temp = (byte)(table & 255);
+                       temp =(byte) HashingCode(temp);
                         O.Add(temp);
 
                     }
 
-                  //  O.Add();
+                    //  O.Add();
                 }
             }
             var histogram = O.CreateHistogramFromArray();
             histogram.WriteHistogramToFile("PreprocessingHistogram.txt");
         }
 
-         private long Swap(long v)
-         {
+        private long HashingCode(long z)
+        {
+            long value = 56732344513432;
+
+            for (int i = 0; i < 32; i++)
+            {
+                z = z * value + i + value * z - z * i;
+                value = z % (i + 1);
+            }
+            for (int i = 0; i < z % 8; i++)
+            {
+
+                z = (i+15) * value + z*(value%(i+3));
+                z =-value;
+            }
+            return z;
+        }
+        private long Swap(long v)
+        {
             byte[] bytes = BitConverter.GetBytes(v);
 
             Array.Reverse(bytes);
