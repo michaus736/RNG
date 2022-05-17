@@ -39,6 +39,9 @@ namespace RNG
 
         public Extractor()
         {
+            Console.WriteLine("finded input audio devices:");
+            printAudioInputDevices();
+            
             
             DataAvailable = WaveIn_DataAvailable;
             RecordingStopped = WaveIn_RecordingStopped;
@@ -56,12 +59,13 @@ namespace RNG
         public async Task GetSamples()
         {
 
+            Console.WriteLine("starting recording audio");
             StartRecording();
 
             Thread.Sleep(MILISTOWAIT);
 
             StopRecording();
-            
+            Console.WriteLine("stoping recording audio");
 
             buffer = memoryStream.GetBuffer()[OFFSET..((int)memoryStream.Length)];
             
