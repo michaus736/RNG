@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace RNG
 {
-    internal class PostProcessingRNG
+
+    public class PostProcessingRNG
     {
 
         /// <summary>
@@ -50,7 +51,7 @@ namespace RNG
 
         //samples array reference
         byte[] data;
-
+        List<byte> O = new List<byte>();
 
         Extractor extractor;
 
@@ -73,9 +74,6 @@ namespace RNG
 
         public void Parse()
         {
-            //output list of random 256-bit numbers
-            List<byte> O = new List<byte>();
-            int n = Extractor.BUFFER_SIZE / 2;
             data = data.Select(x => (byte)(x & pattern3LSB)).ToArray();
 
             double[] c = new double[8];
@@ -91,16 +89,14 @@ namespace RNG
             int counter =0;
 
 
-            while (O.Count < 100000)
+            while (O.Count < 100_000)
             {
-                string num = "";
 
                 for (int i = 0; i < L - 1; i++)
                 {
                     int t = 0;
-                    x[t, i] = ((0.071428571 * data[counter]) + x[t, i]) * 0.666666667;//?? co z t w x_t^i i co to jest y przy r we wzorze
+                    x[t, i] = ((0.071428571 * data[counter]) + x[t, i]) * 0.666666667;
                     counter++;
-                    //if(x[i]<0||x[i]>1)throw new ArithmeticException("no zjebało się na amen");
                 }
 
 
@@ -164,5 +160,15 @@ namespace RNG
                 return ALPHA * (1 - x);
         }
 
+
+        public byte[] GetRandomData()
+        {
+            return O.ToArray();
+        }
+
     }
+
+
+
+    
 }
