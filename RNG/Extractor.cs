@@ -14,9 +14,9 @@ namespace RNG
     {
 
         const int SAMPLE_RATE = 44100;
-        public const int BUFFER_SIZE = 1 * 1024 * 1024 * 2;//1MB * 2(evenly numbers 0 and 255 are discarded)
+        public const int BUFFER_SIZE = 900000;
         const int SAMPLE_ARRAY_SIZE = BUFFER_SIZE * 3;
-        const int MILISTOWAIT = 20000;
+        const int MILISTOWAIT = 2000;
         const int OFFSET = 80000;
         const int CHUNK = 80000;
 
@@ -39,6 +39,9 @@ namespace RNG
 
         public Extractor()
         {
+            Console.WriteLine("finded input audio devices:");
+            printAudioInputDevices();
+            
             
             DataAvailable = WaveIn_DataAvailable;
             RecordingStopped = WaveIn_RecordingStopped;
@@ -56,14 +59,15 @@ namespace RNG
         public async Task GetSamples()
         {
 
+            Console.WriteLine("starting recording audio");
             StartRecording();
 
             Thread.Sleep(MILISTOWAIT);
 
             StopRecording();
-            
+            Console.WriteLine("stoping recording audio");
 
-            buffer = memoryStream.GetBuffer()[OFFSET..(BUFFER_SIZE + OFFSET)];
+            buffer = memoryStream.GetBuffer()[OFFSET..((int)memoryStream.Length)];
             
             await memoryStream.FlushAsync();
         }
