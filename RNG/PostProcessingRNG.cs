@@ -76,6 +76,7 @@ namespace RNG
             //output list of random 256-bit numbers
             List<byte> O = new List<byte>();
             int n = Extractor.BUFFER_SIZE / 2;
+
             data = data.Select(x => (byte)(x & pattern3LSB)).ToArray();
 
             double[] c = new double[8];
@@ -115,7 +116,8 @@ namespace RNG
                             index2 = i % L;
                         else
                             index2 = (i - 1) % L;
-                        x[t + 1, i] = (1 - EPSILON) * TentMap(x[t, i]) + (EPSILON / 2) * (TentMap(x[t, index1]) + TentMap(x[t, index2]));
+                        x[t + 1, i] = (1 - EPSILON) * TentMap(x[t, i])
+                            + (EPSILON / 2) * (TentMap(x[t, index1]) + TentMap(x[t, index2]));
                     }
                 }
                 for (int i = 0; i <= L - 1; i++)
@@ -131,7 +133,9 @@ namespace RNG
                 }
                 for (int i = 0; i < 4; i++)
                 {
-                    for (int j = 0; j < 4; j++)
+                    string len = Convert.ToString(z[i]);
+                    int length = len.Length ;
+                    for (int j = 0; 8*j <=length; j++)
                     {
                         ulong table =(ulong) z[i];
                         table = table >> (8 * j);
@@ -163,6 +167,9 @@ namespace RNG
             else
                 return ALPHA * (1 - x);
         }
-
+        public byte[] GetRandomData()
+        {
+            return O.ToArray();
+        }
     }
 }
